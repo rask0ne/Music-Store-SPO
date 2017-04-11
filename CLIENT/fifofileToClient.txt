@@ -1,0 +1,6 @@
+Genres Avaliable: 
+rock
+blues
+jazz
+trip-hop
+/
