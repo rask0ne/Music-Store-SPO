@@ -1,6 +1,7 @@
 QT += core
 QT -= gui
 
+CONFIG += c++11
 TARGET = Logging
 CONFIG += console
 CONFIG -= app_bundle

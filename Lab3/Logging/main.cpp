@@ -11,9 +11,15 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <iostream>
+#include <string>
+#include <cstdlib>
 
 
+using namespace std;
 
+
+#define PIPE_NAME "/home/rask0ne/CLIENT/fifofile.txt"
 #define BUFFSIZE 256                                                 // bufsize
 #define QUEUE_PIPE "/home/rask0ne/Logging/queuefile"
 #define QUEUE_FILE_SEMAPHORE "/queueFile_semaphore"
@@ -55,6 +61,16 @@ bool logInFile()
     return true;
 }
 
+char *itoa(long n)
+{
+    int len = n==0 ? 1 : floor(log10l(labs(n)))+1;
+    if (n<0) len++; // room for negative sign '-'
+
+    char *buf = (char*)calloc(sizeof(char), len+1); // +1 for null
+    snprintf(buf, len+1, "%ld", n);
+    return   buf;
+}
+
 void sendInt(int send,pid_t adress)
 {
     sleep(1);
@@ -83,11 +99,15 @@ int main(int argc, char *argv[])
 
     // ----------------------LOGGER PROCESS------------------------------------
 
+
+    FILE* pipe;
     int signo;
     sigset_t newmask;                                                // mask for signals
     sigemptyset(&newmask);
     sigaddset(&newmask, SIGUSR1);
     sigprocmask(SIG_BLOCK, &newmask, NULL);
+
+    char* str = new char[BUFFSIZE];
 
     int parentID = 0;
     parentID = atoi(argv[1]);                                        // get ppid from a command line
@@ -104,7 +124,16 @@ int main(int argc, char *argv[])
     }
     printf("sending - %d\n",(int)getpid());
     bool flag = true;
-    sendInt((int)getpid(),parentID);
+
+    pipe = fopen(PIPE_NAME, "w");
+    str = itoa(getpid());
+    cout << endl << itoa(getpid()) << endl;
+    fputs(str, pipe);// get inquery
+    fflush (pipe);
+    fclose(pipe);
+    printf("close\n");
+    kill(parentID,SIGUSR1);
+    //sendInt((int)getpid(),parentID);
     sigwait(&newmask,&signo);
     if (signo == SIGUSR1)
     {

@@ -219,7 +219,7 @@ int main(int argc, char *argv[])
         else kill((pid_t)parentID,SIGUSR1);
     }
     QCoreApplication::quit();
-    cout << "HUEHUEHUE";
+    cout << "HUEHUEHUE" << endl;
     user->closeConnectionToPipe();                             // close pipe
     printf("kill\n");
     sem_post(mutex);

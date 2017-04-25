@@ -168,9 +168,21 @@ int main(int argc, char *argv[])
             strcat(buf,"'");
             system(buf);
 
-            int loggerId = 0;
-            loggerId = getInt();
-    printf("getting - %d\n",loggerId);
+            Shop* res = new Shop(10, 15, 20, 25);
+            int loggerID = 0;
+            sigwait(&newmask, &signo);
+            if(!res->connectToPipe(PIPE_NAME, "r")){                 // try to connect to pipe
+                  printf("shop can't connect\n");
+                  return -1;
+            }                                        // close 1 end of pipe
+            sleep(1);
+            printf("alive\n");
+            fread(str,1,BUFFSIZE, res->pipe);        // read from pipe in buffer
+            fflush (res->pipe);
+            loggerID = getClientID(str);
+            //loggerId = getInt();
+            res->closeConnectionToPipe();
+    printf("getting - %d\n",loggerID);
     for(int i = 0; i < CLIENT_COUNT; i++)
     {
 
@@ -184,8 +196,8 @@ int main(int argc, char *argv[])
     }
 
     printf("after create\n");
-    kill(loggerId,SIGUSR1);
-    Shop* res = new Shop(10, 15, 20, 25);
+    kill(loggerID,SIGUSR1);
+
     int clientClose = CLIENT_COUNT;
     while (clientClose > 0)                                          // while not all was closed
     {
